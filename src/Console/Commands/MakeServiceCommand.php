@@ -58,6 +58,10 @@ class MakeServiceCommand extends GeneratorCommand
             $this->call('make:request', ['name' => $request]);
         }
 
+        if ($this->option('facade')) {
+            $this->call('make:facade', ['name' => $request]);
+        }
+
         if (! Str::startsWith($request, [
             $this->laravel->getNamespace(),
             'Illuminate',
@@ -133,9 +137,10 @@ class MakeServiceCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['extra', 'e', InputOption::VALUE_NONE, 'Create an form request class for this service'],
+            ['extra', 'e', InputOption::VALUE_NONE, 'Create a form request class for this service'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the service already exists'],
             ['request', 'r', InputOption::VALUE_OPTIONAL, 'Create a form request namespace class for this service'],
+            ['facade', '', InputOption::VALUE_NONE, 'Create a facade class for this service'],
         ];
     }
 }
