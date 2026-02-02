@@ -2,7 +2,7 @@
 
 namespace Nowodev\Makeservice\Tests;
 
-use Ikechukwukalu\Makeservice\MakeServiceServiceProvider;
+use Nowodev\Makeservice\MakeServiceServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase

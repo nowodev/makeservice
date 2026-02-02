@@ -1,6 +1,6 @@
 <?php
 
-namespace Ikechukwukalu\Makeservice;
+namespace Nowodev\Makeservice;
 
 use Illuminate\Support\ServiceProvider;
 use Nowodev\Makeservice\Console\Commands\MakeActionCommand;
