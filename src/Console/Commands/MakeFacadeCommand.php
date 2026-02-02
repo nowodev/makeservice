@@ -1,6 +1,6 @@
 <?php
 
-namespace Ikechukwukalu\Makeservice\Console\Commands;
+namespace Nowodev\Makeservice\Console\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;

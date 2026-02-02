@@ -1,6 +1,6 @@
 <?php
 
-namespace Ikechukwukalu\Makeservice\Tests;
+namespace Nowodev\Makeservice\Tests;
 
 use Ikechukwukalu\Makeservice\MakeServiceServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;

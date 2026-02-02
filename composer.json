@@ -1,17 +1,17 @@
 {
-    "name": "ikechukwukalu/makeservice",
+    "name": "nowodev/makeservice",
     "description": "A laravel package for scaffolding service classes.",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Ikechukwukalu\\Makeservice\\": "src/",
-            "Ikechukwukalu\\Makeservice\\Console\\Commands\\": "src/Console/Commands/"
+            "Nowodev\\Makeservice\\": "src/",
+            "Nowodev\\Makeservice\\Console\\Commands\\": "src/Console/Commands/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Ikechukwukalu\\Makeservice\\Tests\\": "Tests/"
+            "Nowodev\\Makeservice\\Tests\\": "Tests/"
         }
     },
     "scripts": {
@@ -20,8 +20,8 @@
     },
     "authors": [
         {
-            "name": "Ikechukwu Kalu",
-            "email": "ea.ikechukwukalu@gmail.com"
+            "name": "Nowodev",
+            "email": "toluwaniokunowo@gmail.com"
         }
     ],
     "minimum-stability": "dev",
@@ -29,7 +29,7 @@
         "illuminate/console": "^8.0|^9.0|^10.0|^11.0|^12.0",
         "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
         "symfony/console": "^5.4|^6.0|^7.0",
-        "php": ">=7.3"
+        "php": ">=8.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0|^7.0|^8.0|^9.0|^10.0",
@@ -39,7 +39,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Ikechukwukalu\\Makeservice\\MakeServiceServiceProvider"
+                "Nowodev\\Makeservice\\MakeServiceServiceProvider"
             ]
         }
     }

@@ -3,13 +3,13 @@
 namespace Ikechukwukalu\Makeservice;
 
 use Illuminate\Support\ServiceProvider;
-use Ikechukwukalu\Makeservice\Console\Commands\MakeActionCommand;
-use Ikechukwukalu\Makeservice\Console\Commands\MakeEnumCommand;
-use Ikechukwukalu\Makeservice\Console\Commands\MakeFacadeCommand;
-use Ikechukwukalu\Makeservice\Console\Commands\MakeInterfaceCommand;
-use Ikechukwukalu\Makeservice\Console\Commands\MakeRepositoryCommand;
-use Ikechukwukalu\Makeservice\Console\Commands\MakeServiceCommand;
-use Ikechukwukalu\Makeservice\Console\Commands\MakeTraitCommand;
+use Nowodev\Makeservice\Console\Commands\MakeActionCommand;
+use Nowodev\Makeservice\Console\Commands\MakeEnumCommand;
+use Nowodev\Makeservice\Console\Commands\MakeFacadeCommand;
+use Nowodev\Makeservice\Console\Commands\MakeInterfaceCommand;
+use Nowodev\Makeservice\Console\Commands\MakeRepositoryCommand;
+use Nowodev\Makeservice\Console\Commands\MakeServiceCommand;
+use Nowodev\Makeservice\Console\Commands\MakeTraitCommand;
 
 class MakeServiceServiceProvider extends ServiceProvider
 {
