@@ -50,6 +50,18 @@ class MakeServiceCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
+        // Create controller if option is provided
+        if ($this->option('controller')) {
+            $controllerName = class_basename($name) . 'Controller';
+            $controllerArgs = ['name' => $controllerName];
+            
+            if ($this->option('force')) {
+                $controllerArgs['--force'] = true;
+            }
+            
+            $this->call('make:controller', $controllerArgs);
+        }
+
         if (!$request = $this->option('request')) {
             return parent::buildClass($name);
         }
@@ -137,6 +149,7 @@ class MakeServiceCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
+            ['controller', 'c', InputOption::VALUE_NONE, 'Create a controller for this service'],
             ['extra', 'e', InputOption::VALUE_NONE, 'Create a form request class for this service'],
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the service already exists'],
             ['request', 'r', InputOption::VALUE_OPTIONAL, 'Create a form request namespace class for this service'],

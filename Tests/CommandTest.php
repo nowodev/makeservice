@@ -13,6 +13,10 @@ class CommandTest extends TestCase
         $this->artisan('make:service SampleService')->assertSuccessful();
 
         $this->artisan('make:service SampleService -f')->assertSuccessful();
+        
+        $this->artisan('make:service SampleService --controller')->assertSuccessful();
+        
+        $this->artisan('make:service SampleService --controller -f')->assertSuccessful();
 
         $this->artisan('make:request SampleRequest')->assertSuccessful();
 
