@@ -52,7 +52,15 @@ class MakeServiceCommand extends GeneratorCommand
     {
         // Create controller if option is provided
         if ($this->option('controller')) {
-            $controllerName = class_basename($name) . 'Controller';
+            $baseName = class_basename($name);
+            
+            // Remove "Service" suffix if present, then add "Controller"
+            if (Str::endsWith($baseName, 'Service')) {
+                $controllerName = Str::replaceLast('Service', '', $baseName) . 'Controller';
+            } else {
+                $controllerName = $baseName . 'Controller';
+            }
+            
             $controllerArgs = ['name' => $controllerName];
             
             if ($this->option('force')) {
