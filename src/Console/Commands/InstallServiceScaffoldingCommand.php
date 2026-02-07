@@ -335,21 +335,15 @@ use Throwable;
 
 class ServiceException extends Exception
 {
-    protected string \$errorCode = 'SERVICE_ERROR';
+    protected string \$errorCode;
 
     protected int \$statusCode = 400;
 
     protected array \$context = [];
 
-    public function __construct(string \$message = '', array \$context = [], ?string \$errorCode = null, ?int \$statusCode = null, ?Throwable \$previous = null)
+    public function __construct(string \$message = '', array \$context = [], ?Throwable \$previous = null)
     {
         \$this->context = \$context;
-        if (\$errorCode !== null) {
-            \$this->errorCode = \$errorCode;
-        }
-        if (\$statusCode !== null) {
-            \$this->statusCode = \$statusCode;
-        }
         parent::__construct(\$message, 0, \$previous);
     }
 
