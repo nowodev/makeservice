@@ -335,7 +335,7 @@ use Throwable;
 
 class ServiceException extends Exception
 {
-    protected string \$errorCode;
+    protected string \$errorCode = '';
 
     protected int \$statusCode = 400;
 
