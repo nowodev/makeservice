@@ -31,7 +31,8 @@ class InstallServiceScaffoldingCommand extends Command
         $this->line('  - app/Support/ServiceResponse.php');
         $this->line('  - app/Services/BaseService.php');
         $this->line('  - app/Exceptions/ServiceException.php');
-        $this->line('  - bootstrap/app.php (will add exception handling)');
+        $this->line('  - bootstrap/app.php (inject exception handling into withExceptions)');
+        $this->line('  - config/logging.php (add api channel after stack)');
         $this->newLine();
         $this->warn('It is intended for new projects. Existing customizations may be overwritten.');
 
@@ -47,9 +48,9 @@ class InstallServiceScaffoldingCommand extends Command
         $this->createBaseService($appNamespace);
         $this->createServiceException($appNamespace);
         $this->modifyBootstrapApp($appNamespace);
+        $this->addApiLogChannel();
 
         $this->info('Service scaffolding installed successfully.');
-        $this->line('Ensure your <comment>config/logging.php</comment> defines an <comment>api</comment> channel if you use BaseService or the exception handler.');
 
         return self::SUCCESS;
     }
@@ -424,23 +425,63 @@ PHP;
             $content = $this->addImportToBootstrap($content, $spatieImport);
         }
 
-        $exceptionsBlock = $this->getWithExceptionsBlock($namespace);
+        $exceptionsBody = $this->getWithExceptionsBody($namespace);
 
-        if (strpos($content, '->withExceptions(') !== false) {
-            $this->warn('  bootstrap/app.php already contains withExceptions. Please add the render logic manually if needed.');
+        // Inject into existing ->withExceptions(function (Exceptions $exceptions): void { ... })
+        $pattern = '/->withExceptions\s*\(\s*function\s*\(\s*Exceptions\s+\$exceptions\s*\)\s*:\s*void\s*\{\s*(?:\/\/?\s*)?\s*\}/s';
+        $replacement = '->withExceptions(function (Exceptions $exceptions): void {' . "\n" . $exceptionsBody . "\n    }";
+
+        $newContent = preg_replace($pattern, $replacement, $content, 1);
+
+        if ($newContent !== null && $newContent !== $content) {
+            file_put_contents($path, $newContent);
+            $this->line('  Updated bootstrap/app.php');
+        } elseif (strpos($content, '->withExceptions(') === false) {
+            $this->warn('  Could not find withExceptions block in bootstrap/app.php. Add the render logic manually.');
         } else {
-            $content = preg_replace(
-                '/->create\s*\(\s*\)\s*;/',
-                $exceptionsBlock . "\n    ->create();",
-                $content,
-                1
-            );
-            if ($content === null) {
-                $this->warn('  Could not inject withExceptions into bootstrap/app.php.');
-            } else {
-                file_put_contents($path, $content);
-                $this->line("  Updated bootstrap/app.php");
-            }
+            $this->warn('  Could not inject into withExceptions (block may already be customized). Add the render logic manually if needed.');
+        }
+    }
+
+    protected function addApiLogChannel(): void
+    {
+        $path = $this->laravel->basePath('config/logging.php');
+
+        if (! file_exists($path)) {
+            $this->warn('  config/logging.php not found. Skipping api channel.');
+            return;
+        }
+
+        $content = file_get_contents($path);
+
+        if (strpos($content, "'api' =>") !== false || strpos($content, '"api" =>') !== false) {
+            $this->line('  config/logging.php already has an api channel.');
+            return;
+        }
+
+        $apiChannel = <<<'CHAN'
+
+        'api' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/api_error.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+CHAN;
+
+        // Insert after first channel (usually 'stack'): match top-level "    ],\n\n    'channel'" only
+        $inserted = preg_replace(
+            "/(    \],)(\n\n)(    ')([a-z_]+)('\s*=>\s*\[)/m",
+            '$1$2' . trim($apiChannel) . "\n$2$3$4$5",
+            $content,
+            1
+        );
+
+        if ($inserted !== null && $inserted !== $content) {
+            file_put_contents($path, $inserted);
+            $this->line('  Added api channel to config/logging.php');
+        } else {
+            $this->warn('  Could not find insertion point in config/logging.php. Add the api channel manually after stack.');
         }
     }
 
@@ -454,13 +495,12 @@ PHP;
         return substr($content, 0, $pos + 1) . $line . substr($content, $pos + 1);
     }
 
-    protected function getWithExceptionsBlock(string $namespace): string
+    protected function getWithExceptionsBody(string $namespace): string
     {
         $serviceException = $namespace . '\Exceptions\ServiceException';
         $serviceResponse = $namespace . '\Support\ServiceResponse';
 
-        $block = <<<BLOCK
-    ->withExceptions(function (\\Illuminate\\Foundation\\Configuration\\Exceptions \$exceptions) {
+        return <<<BODY
         \$exceptions->render(function (\\Throwable \$e, \\Illuminate\\Http\\Request \$request) {
             if (\$request->expectsJson() || \$request->is('api/*')) {
                 if (\$e instanceof {$serviceException}) {
@@ -565,9 +605,7 @@ PHP;
                 )->toJsonResponse();
             }
         });
-BLOCK;
-
-        return $block;
+BODY;
     }
 
     protected function ensureDirectoryExists(string $dir): void
