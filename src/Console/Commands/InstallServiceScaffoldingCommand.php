@@ -31,6 +31,7 @@ class InstallServiceScaffoldingCommand extends Command
         $this->line('  - app/Support/ServiceResponse.php');
         $this->line('  - app/Services/BaseService.php');
         $this->line('  - app/Exceptions/ServiceException.php');
+        $this->line('  - app/Http/Requests/BaseFormRequest.php');
         $this->line('  - bootstrap/app.php (inject exception handling into withExceptions)');
         $this->line('  - config/logging.php (add api channel after stack)');
         $this->newLine();
@@ -47,6 +48,7 @@ class InstallServiceScaffoldingCommand extends Command
         $this->createServiceResponse($appNamespace);
         $this->createBaseService($appNamespace);
         $this->createServiceException($appNamespace);
+        $this->createBaseFormRequest($appNamespace);
         $this->modifyBootstrapApp($appNamespace);
         $this->addApiLogChannel();
 
@@ -380,6 +382,59 @@ PHP;
 
         file_put_contents($path, $content);
         $this->line("  Created app/Exceptions/ServiceException.php");
+    }
+
+    protected function createBaseFormRequest(string $namespace): void
+    {
+        $path = $this->laravel->basePath('app/Http/Requests/BaseFormRequest.php');
+        $this->ensureDirectoryExists(dirname($path));
+
+        $content = <<<PHP
+<?php
+
+namespace {$namespace}\Http\Requests;
+
+use {$namespace}\Support\ServiceResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Symfony\Component\HttpFoundation\Response;
+
+class BaseFormRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \\Illuminate\\Contracts\\Validation\\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+
+        ];
+    }
+
+    public function failedValidation(Validator \$validator): HttpResponseException
+    {
+        throw new HttpResponseException(ServiceResponse::failure(
+            message: 'Validation error',
+            statusCode: Response::HTTP_UNPROCESSABLE_ENTITY,
+            errors: \$validator->errors()
+        )->toJsonResponse());
+    }
+}
+PHP;
+
+        file_put_contents($path, $content);
+        $this->line('  Created app/Http/Requests/BaseFormRequest.php');
     }
 
     protected function modifyBootstrapApp(string $namespace): void
