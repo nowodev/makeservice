@@ -3,6 +3,7 @@
 namespace Nowodev\Makeservice;
 
 use Illuminate\Support\ServiceProvider;
+use Nowodev\Makeservice\Console\Commands\InstallServiceScaffoldingCommand;
 use Nowodev\Makeservice\Console\Commands\MakeActionCommand;
 use Nowodev\Makeservice\Console\Commands\MakeEnumCommand;
 use Nowodev\Makeservice\Console\Commands\MakeFacadeCommand;
@@ -23,6 +24,7 @@ class MakeServiceServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
+                InstallServiceScaffoldingCommand::class,
                 MakeActionCommand::class,
                 MakeEnumCommand::class,
                 MakeFacadeCommand::class,
