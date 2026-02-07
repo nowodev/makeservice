@@ -469,13 +469,23 @@ PHP;
         ],
 CHAN;
 
-        // Insert after first channel (usually 'stack'): match top-level "    ],\n\n    'channel'" only
+        // Insert after first channel (usually 'stack'). Try 8-space then 4-space indent (Laravel style).
+        // Match "        ]," or "    ]," followed by newline(s) and next channel key.
         $inserted = preg_replace(
-            "/(    \],)(\n\n)(    ')([a-z_]+)('\s*=>\s*\[)/m",
-            '$1$2' . trim($apiChannel) . "\n$2$3$4$5",
+            "/(        \],)(\s*\n+\s*)(        ')([a-z_]+)('\s*=>\s*\[)/m",
+            '$1' . "\n\n" . trim($apiChannel) . "\n\n" . '$3$4$5',
             $content,
             1
         );
+
+        if ($inserted === null || $inserted === $content) {
+            $inserted = preg_replace(
+                "/(    \],)(\s*\n+\s*)(    ')([a-z_]+)('\s*=>\s*\[)/m",
+                '$1' . "\n\n" . trim($apiChannel) . "\n\n" . '$3$4$5',
+                $content,
+                1
+            );
+        }
 
         if ($inserted !== null && $inserted !== $content) {
             file_put_contents($path, $inserted);
